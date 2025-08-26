@@ -358,7 +358,7 @@ const getMiningBonus = async (req, res) => {
             user_id: userDetail.id,
             remarks: "Node Reward",
             ttime: {
-                [Op.gte]: today, // Greater than or equal to today (start of the day)
+                [Op.gte]: today, // Greate than or equal to today (start of the day)
             },
         },
     });
