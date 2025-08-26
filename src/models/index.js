@@ -5,14 +5,14 @@ const User = require('./User');
 const Investment = require('./Investment');
 const Withdraw = require('./Withdraw');
 const Income = require('./Income');
-const Graph = require('./Graph');
+// const Graph = require('./Graph');
 const Reward = require('./Reward');
 const Growth = require('./Growth');
 
-// const TelegramUser = require('./TelegramUser');
+
 
 const Transaction = require('./Transaction');
-const TelegramUser = require('./TelegramUser');
+
 const UserTask = require('./UserTask');
 const Task = require('./Task');
 const WalletModel = require('./WalletModel');
@@ -25,8 +25,8 @@ User.hasMany(Investment, { foreignKey: 'user_id' });
 Investment.belongsTo(User, { foreignKey: 'user_id' });
 
 
-User.hasMany(Graph, { foreignKey: 'user_id' });
-Graph.belongsTo(User, { foreignKey: 'user_id' });
+// User.hasMany(Graph, { foreignKey: 'user_id' });
+// Graph.belongsTo(User, { foreignKey: 'user_id' });
 
 User.hasMany(Withdraw, { foreignKey: 'user_id' });
 Withdraw.belongsTo(User, { foreignKey: 'user_id' });
@@ -35,8 +35,8 @@ User.hasMany(Income, { foreignKey: 'user_id' });
 Income.belongsTo(User, { foreignKey: 'user_id' });
 WalletModel.belongsTo(User, { foreignKey: 'user_id' });
 
-Task.hasMany(UserTask, { foreignKey: "task_id", as: "userTasks" });
-UserTask.belongsTo(Task, { foreignKey: "task_id", as: "task" });
+// Task.hasMany(UserTask, { foreignKey: "task_id", as: "userTasks" });
+// UserTask.belongsTo(Task, { foreignKey: "task_id", as: "task" });
 
 // ✅ User Wallet Balance Model
 const UserWalletModel = sequelize.define("WalletModel", {
@@ -62,17 +62,11 @@ const GasSponsorshipModel = sequelize.define("GasSponsorship", {
 }
 );
 
-// User.hasMany(TelegramUser, { foreignKey: 'user_id_fk' });
-// TelegramUser.belongsTo(User, { foreignKey: 'user_id_fk' });
 
-
-
-// User.hasMany(TelegramUser, { foreignKey: 'user_id_fk' });
-// TelegramUser.belongsTo(User, { foreignKey: 'user_id_fk' });
 
 
 // Sync models
 sequelize.sync(); // Use { force: true } only if you want to recreate tables
 
-module.exports = { sequelize, User, Investment, Withdraw, Income, WalletModel, UserWalletModel, GasSponsorshipModel, TelegramUser,Transaction,UserTask,Task,Graph,PasswordReset,Activity,Plan,Reward,Growth};
+module.exports = { sequelize, User, Investment, Withdraw, Income, WalletModel, UserWalletModel, GasSponsorshipModel, Transaction,UserTask,Task,PasswordReset,Activity,Plan,Reward,Growth};
 

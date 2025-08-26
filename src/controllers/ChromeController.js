@@ -1,7 +1,7 @@
 
 const sequelize = require('../config/connectDB'); // Import Sequelize connection
 const { QueryTypes,Op } = require('sequelize');
-const TelegramUser = require("../models/TelegramUser");
+
 const { User,Income,Transaction,UserTask} = require("../models"); // Adjust path as needed
 const Task = require("../models/Task");
 const moment = require("moment-timezone");
@@ -77,17 +77,7 @@ const getTelegramHistory = async (req, res) => {
         }
 
         // यूज़र टेबल से telegram_id प्राप्त करें और telegram_users टेबल में उसी telegram_id से match करें
-        const telegramUsers = await TelegramUser.findAll({ where: { id: user.telegram_id } });
-       
-
-        // अगर कोई डेटा नहीं मिला तो 404 रेस्पॉन्स भेजें
-        if (telegramUsers.length === 0) {
-            return res.status(404).json({
-                message: "No matching telegram users found for the logged-in user",
-                status: false,
-                timeStamp: new Date(),
-            });
-        }
+      
 
         // सफल डेटा रेस्पॉन्स
         res.json({ success: true, data: telegramUsers });

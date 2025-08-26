@@ -3,7 +3,7 @@ let router = express.Router();
 
 const AuthController = require("../controllers/AuthController");
 const IncomeController = require("../controllers/incomeController");
-const TelegramController = require("../controllers/TelegramController");
+// const TelegramController = require("../controllers/TelegramController");
 const DashboardController = require("../controllers/DashboardController");
 const authMiddleware = require("../middleware/authMiddleware"); // JWT Auth Middleware
 const telegramAuthMiddleware = require("../middleware/telegramAuthMiddleware"); // JWT Auth Middleware
@@ -11,7 +11,7 @@ const passport = require('passport');
 const googleController = require('../controllers/googleController');
 const teamController = require('../controllers/teamController');
 const InvestController = require('../controllers/InvestController');
-const GraphController = require('../controllers/GraphController');
+// const GraphController = require('../controllers/GraphController');
 const ChromeController = require('../controllers/ChromeController');
 const { getVip } = require("../services/userService");
 const  withdrawController  = require('../controllers/withdrawController');
@@ -53,12 +53,12 @@ router.post("/verify-account", authMiddleware, DashboardController.verifyAccount
 
 router.get("/deposit-History", authMiddleware, InvestController.getHistory);
 router.post("/recharge", authMiddleware, InvestController.confirmDeposit);
-router.get("/telegram-history", authMiddleware, TelegramController.getTelegramHistory);
+// router.get("/telegram-history", authMiddleware, TelegramController.getTelegramHistory);
 router.post("/generate-wallet", authMiddleware, InvestController.generateWallet);
 router.get("/cryptapi-upi-callback", InvestController.dynamicUpiCallback);
 
 
-router.get("/roi", authMiddleware, GraphController.getRoi);
+// router.get("/roi", authMiddleware, GraphController.getRoi);
 // withdraw
 router.post("/withdrawal",authMiddleware,withdrawController.withdrawRequest)
 router.get("/sendCode",authMiddleware,withdrawController.sendCode)
@@ -79,20 +79,7 @@ router.get('/get-e-mining-bonus',authMiddleware, ChromeController.getMiningBonus
 
 
 // telegram api 
-router.post('/telegram-login', AuthController.loginWithTelegram);
-router.post('/telegram-user-detail', TelegramController.getUserByTelegramId);
-router.post('/start-trade', telegramAuthMiddleware,TelegramController.startTrade);
 
-router.post('/get-last-trade',telegramAuthMiddleware, TelegramController.getLastTrade);
-router.post('/claim-reward',telegramAuthMiddleware, TelegramController.claimReward);
-router.get('/fetch-points',telegramAuthMiddleware, TelegramController.fetchPoints);
-router.post('/update-today-roi',telegramAuthMiddleware, TelegramController.updateTodayRoi);
-router.get('/get-mining-bonus',telegramAuthMiddleware, TelegramController.getMiningBonus);
-router.post('/getTasks',telegramAuthMiddleware, TelegramController.getTasks);
-router.get('/get-user-balance',telegramAuthMiddleware, TelegramController.getUserBalance);
-router.post('/startTask',telegramAuthMiddleware, TelegramController.startTask);
-router.post('/claimTask',telegramAuthMiddleware, TelegramController.claimTask);
-router.get('/getReferral',telegramAuthMiddleware, TelegramController.getReferral);
 
 
 
