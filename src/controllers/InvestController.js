@@ -18,7 +18,7 @@ const getHistory = async (req, res) => {
         const userId = user.id;
     
         const investmentHistory = await Investment.findAll({
-            where: { user_id: userId, status:'Active'},
+            where: {status:'Active'},
             order: [['created_at', 'DESC']] // Order by created_at in descending order
         });
         res.json({ success: true, data: investmentHistory });

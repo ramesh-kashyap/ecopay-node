@@ -35,19 +35,12 @@ const User = sequelize.define('User', {
             isEmail: true, // Ensure valid email format
         }
     },
-    google_id: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: true // Ensure Google ID is unique
-    },
+  
     name: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    userbalance: {
-        type: DataTypes.FLOAT,
-        allowNull: true,
-    },
+ 
     password: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -64,11 +57,8 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    todayroi: { type: DataTypes.FLOAT, allowNull: true }, // Stores last trade timestamp
-    total_reward: { type: DataTypes.FLOAT, allowNull: true }, // Stores last trade timestamp
     power_leg: { type: DataTypes.FLOAT, allowNull: true }, // Stores last trade timestamp
     vicker_leg: { type: DataTypes.FLOAT, allowNull: true }, // Stores last trade timestamp
-    lastTrade: { type: DataTypes.DATE, allowNull: true }, 
   
    
     created_at: {
@@ -95,32 +85,19 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         allowNull: true
     },
-    is_verify: {
-        type: DataTypes.INET,
-        allowNull: true
-    },
+   
     ParentId: {
         type: DataTypes.INTEGER,
         allowNull: true
     },
-    detail_changed_date: {
-        type: DataTypes.DATE,
-        allowNull: true
-    },
+   
     adate: {
         type: DataTypes.DATE,
         allowNull: true
     },
-    ip: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
+ 
     
-    telegram_id: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        unique: true, // Ensuring telegram_id is unique
-    },
+ 
     
   
 }, {

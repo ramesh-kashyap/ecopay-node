@@ -290,11 +290,12 @@ const register2 = async (req, res) => {
 // Login User Function
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-
-        if (!email || !password) {
+        const { username, password } = req.body;
+         console.log('dhsh',username,password);
+         
+        if (!username || !password) {
             return res.status(200).json({
-                message: 'Email and Password are required!',
+                message: 'Username and Password are required!',
                 status: false,
             });
         }
@@ -302,7 +303,7 @@ const login = async (req, res) => {
         // Check if user exists in the database
        const user = await User.findOne({
               where: {
-                email,
+                username,
                 active_status: {
                   [Op.ne]: 'Block'
                 }
@@ -316,14 +317,7 @@ const login = async (req, res) => {
             });
         }
 
-       if (user.google_id)
-        {
-            return res.status(200).json({
-                message: 'Sign In with Google!',
-                status: false,
-            });
-        }
-
+   
         // Compare password
         const isMatch = await bcrypt.compare(password, user.password);        
         if (!isMatch) {
@@ -334,7 +328,7 @@ const login = async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "1h" });
         return res.status(200).json({
             message: 'Login successful!',
             status: true,
@@ -429,13 +423,8 @@ const loginWithTelegram = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
     try {
-        
-
-        const user = await User.findOne({
-            attributes: ['id', 'name', 'email','telegram_id','ip'],
-            where: { id: req.user.id }
-        });
-
+      const userId = req.user.id; 
+        const user = await User.findOne({where: { id: userId  }});
 
         if (!user) {
             return res.status(200).json({ message: "User not found" });
