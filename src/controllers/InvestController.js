@@ -1,10 +1,13 @@
-const { User, Investment, WalletModel,Activity,Transaction,Income } = require("../models"); // Import User model
+const { User, Investment,Activity,Transaction,Income } = require("../models"); // Import User model
 const nodemailer = require("nodemailer");
-const { Op } = require('sequelize');
 const { ethers } = require("ethers");
 const {TronWeb} = require("tronweb");
 const axios = require("axios");
 const logger = require("../../utils/logger");
+const sequelize = require("../config/connectDB");
+const TransactionBank = require("../models/transactionBank");
+const { Op, fn, col } = require("sequelize");
+const EcoPay = require("../models/EcoPay");
 
 
 const getHistory = async (req, res) => {
@@ -27,6 +30,175 @@ const getHistory = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+const getDirectIncome = async (req, res) => {
+  try {
+    const userId = req.user.id; // ✅ Token से लिया हुआ userId
+    console.log("Fetching Level Income for User ID:", userId);
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is missing from token" });
+    }
+
+
+     const transactionResult = await Transaction.findOne({
+      attributes: [[fn("IFNULL", fn("SUM", col("amount")), 0), "total"]],
+      where: {
+        user_id: userId,
+        status: { [Op.in]: ["SUCCESS", "Pending"] },
+      },
+      raw: true,
+    });
+
+    
+ const transactionBankResult = await TransactionBank.findOne({
+      attributes: [[fn("IFNULL", fn("SUM", col("amount")), 0), "total"]],
+      where: {
+        userId: userId,
+        status: { [Op.in]: ["SUCCESS", "PENDING","ACCEPTED"] },
+      },
+      raw: true,
+    });
+ 
+ 
+    // ✅ Total Approved Withdraws
+    const withdrawResult = await EcoPay.findOne({
+      attributes: [[fn("IFNULL", fn("SUM", col("amount")), 0), "total"]],
+      where: {
+        user_id: userId,
+        
+      },
+      raw: true,
+    });
+ 
+ 
+    const totalTxBank = parseFloat(transactionBankResult.total);
+ 
+    const totalTx = parseFloat(transactionResult.total);
+    const totalWd = parseFloat(withdrawResult.total);
+    const finalAmount =totalWd-(totalTx+totalTxBank) 
+   
+
+    return res.status(200).json({
+      success: true,
+      userId,
+      
+      balance: finalAmount
+    });
+
+  } catch (error) {
+    console.error("Error fetching balance:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
+  }
+};
+
+const getAllTransactionHistory = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { page = 1, limit = 10 } = req.query; // default 10 records
+    const offset = (page - 1) * limit;
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is missing from token" });
+    }
+
+    const transactions = await Transaction.findAll({
+      where: { user_id: userId },
+      attributes: ["remark", "status", "amount", "ttime","phone","api_trans_id"],
+      order: [["id", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+
+    const transactionsBankRaw = await TransactionBank.findAll({
+      where: { userId: userId },
+      attributes: ["status", "amount", "orderId", "createdAt","accountNo"],
+      order: [["id", "DESC"]],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
+    });
+
+    const transactionsBank = transactionsBankRaw.map((txn) => ({
+      ...txn.toJSON(),
+      remark: "Bank Transfer",
+      ttime: txn.createdAt,
+    }));
+
+    const combinedTransactions = [...transactions, ...transactionsBank];
+    combinedTransactions.sort((a, b) => new Date(b.ttime) - new Date(a.ttime));
+
+    return res.status(200).json({
+      success: true,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      transactions: combinedTransactions,
+    });
+
+  } catch (error) {
+    console.error("Error fetching transaction history:", error.message);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+// Controller
+const getTransactionHistory = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    console.log("login:", userId);
+
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is missing from token" });
+    }
+
+    // ✅ Fetch normal transactions
+    const transactions = await Transaction.findAll({
+      where: { user_id: userId },
+      attributes: ["remark", "status", "amount", "ttime", "phone", "api_trans_id"],
+      order: [["id", "DESC"]],
+      limit: 10, // ✅ just in case too many records exist
+    });
+
+    // ✅ Fetch bank transactions
+    const transactionsBankRaw = await TransactionBank.findAll({
+      where: { userId: userId },
+      attributes: ["status", "amount", "orderId", "createdAt", "accountNo"],
+      order: [["id", "DESC"]],
+      limit: 10,
+    });
+
+    // ✅ Map bank transactions with remark + ttime
+    const transactionsBank = transactionsBankRaw.map((txn) => ({
+      ...txn.toJSON(),
+      remark: "Bank Transfer",
+      ttime: txn.createdAt,
+    }));
+
+    // ✅ Combine & Sort
+    const combinedTransactions = [...transactions, ...transactionsBank];
+    combinedTransactions.sort((a, b) => new Date(b.ttime) - new Date(a.ttime));
+
+    // ✅ Slice to only 10 latest records
+    const latest10 = combinedTransactions.slice(0, 10);
+
+    return res.status(200).json({
+      success: true,
+      userId,
+      transactions: latest10,
+    });
+
+  } catch (error) {
+    console.error("Error fetching transaction history:", error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      details: error.message,
+    });
+  }
+};
+
 
 const generateWallet = async (req, res) => {
     try {
@@ -297,4 +469,4 @@ const confirmDeposit = async (req, res) => {
   };
   
 
-module.exports = { getHistory,generateWallet,confirmDeposit,dynamicUpiCallback};
+module.exports = { getHistory,generateWallet,confirmDeposit,dynamicUpiCallback,getDirectIncome,getTransactionHistory,getAllTransactionHistory};

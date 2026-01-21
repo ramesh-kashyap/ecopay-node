@@ -54,8 +54,6 @@ app.use(express.json());
 app.set('trust proxy', true);
 
 
-
-
 // Apply CORS middleware for Express
 app.use(cors({ origin: process.env.ALLOWED_ORIGINS?.split(",") || "*", credentials: true }));
 app.use(express.json());
@@ -100,7 +98,6 @@ app.get("/", (req, res) => {
 // };
 initWebRouter(app);
 
-
 // /start
 
 // bot.onText(/\/start/, (msg) => {
@@ -129,10 +126,6 @@ initWebRouter(app);
 //     // Send image with caption and buttons
 //     bot.sendPhoto(chatId, "https://api.hypermesh.io/banner.png", { caption: welcomeMessage, ...options });
 // });
-
-
-
-
 
 
 // ✅ **Cron Job to Auto-Transfer Funds Every 10 Minutes**

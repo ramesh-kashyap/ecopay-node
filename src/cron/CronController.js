@@ -17,13 +17,7 @@ const countActiveTeamIds = async (userId) => {
       attributes: ['id'],
     });
 
-    const activeDown = await User.findAll({
-      where: {
-        sponsor: arrin,
-        active_status: 'Active'
-      },
-      attributes: ['id'],
-    });
+    const activeDown = await User.findAll({ where: {sponsor: arrin,active_status: 'Active'},attributes: ['id'], });
 
     if (allDown.length > 0) {
       const newLevelIds = allDown.map(u => u.id);

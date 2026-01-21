@@ -328,7 +328,7 @@ const login = async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET);
         return res.status(200).json({
             message: 'Login successful!',
             status: true,
@@ -424,14 +424,24 @@ const loginWithTelegram = async (req, res) => {
 const getUserProfile = async (req, res) => {
     try {
       const userId = req.user.id; 
+      console.log('hii',userId);
         const user = await User.findOne({where: { id: userId  }});
 
-        if (!user) {
-            return res.status(200).json({ message: "User not found" });
-        }
+      if (!user) {
+  return res.status(200).json({ 
+    message: "User not found", 
+    status: false 
+  });
+}
 
-        res.json(user); 
-    } catch (error) {
+
+      return res.status(200).json({
+            message: 'Profile fetch successfully ',
+            success: true,
+            data: user,
+
+        });
+        } catch (error) {
         console.error("Error fetching user:", error.message);
         res.status(200).json({ error: error.message });
     }
@@ -522,12 +532,32 @@ const resetPassword = async (req, res) => {
 
 
 
+const getAllRegisteredPhones = async (req, res) => {
+  try {
+    // Fetch all users' phones
+    const users = await User.findAll({
+      attributes: ['phone'],  // assuming 'phone' is the column name
+    });
+//  console.log(users);
+    if (!users || users.length === 0) {
+      return res.status(200).json({ message: "No registered phones found" });
+    }
+
+    // Extract phone numbers into an array
+   const plainUsers = users.map(user => user.get({ plain: true }));
+const registeredPhones = plainUsers.map(u => u.phone);
+    console.log("Registered Phones:", registeredPhones);
+    res.status(200).json({ registeredPhones });
+  } catch (error) {
+    console.error("Error fetching phones:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 
 
 
 
 
-
-module.exports = { login, register, logout,loginWithTelegram,getUserProfile,updateUserProfile,checkForgotEmail,resetPassword,sendCodeForget,sendCodeSignUp};
+module.exports = { login,getAllRegisteredPhones,register, logout,loginWithTelegram,getUserProfile,updateUserProfile,checkForgotEmail,resetPassword,sendCodeForget,sendCodeSignUp};
 

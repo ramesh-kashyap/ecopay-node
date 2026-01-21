@@ -5,19 +5,35 @@ const Transaction = sequelize.define(
   "Transaction",
   {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    user_id: { type: DataTypes.INTEGER, allowNull: false },
-    user_id_fk: { type: DataTypes.INTEGER, allowNull: false },
-    amount: { type: DataTypes.FLOAT, allowNull: false },
-    remarks: { type: DataTypes.STRING, allowNull: true },
-    rname: { type: DataTypes.STRING, allowNull: true },
-    level: { type: DataTypes.TINYINT, allowNull: true },
-    ttime: { type: DataTypes.DATE, allowNull: false },
+
+    // ✅ User related
+    user_id: { type: DataTypes.INTEGER, allowNull: true },
+
+    // ✅ Recharge Specific Fields
+    usertx: { type: DataTypes.STRING, allowNull: false }, // Unique Transaction ID
+    operator: { type: DataTypes.STRING, allowNull: true },
+    phone: { type: DataTypes.STRING, allowNull: true },
+    circle: { type: DataTypes.STRING, allowNull: true },
+    amount: { type: DataTypes.FLOAT, allowNull: true },
+    remark: { type: DataTypes.STRING, allowNull: true },
+    transaction_id: { type: DataTypes.STRING, allowNull: true }, // Unique Transaction ID
+    operator_ref: { type: DataTypes.STRING, allowNull: true }, // Unique Transaction ID
+    api_trans_id: { type: DataTypes.STRING, allowNull: true }, // Unique Transaction ID transaction_date
+    transaction_date: { type: DataTypes.STRING, allowNull: true }, // Unique Transaction ID 
+
+
+    status: {
+      type: DataTypes.ENUM("Pending", "Success", "Failed", "Refunded"),
+      allowNull: false,
+      defaultValue: "Pending",
+    },
+
+    ttime: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     created_at: { type: DataTypes.DATE, allowNull: true },
-    credit_type: { type: DataTypes.BIGINT, allowNull: false, defaultValue: "0" },
   },
   {
     tableName: "transactions",
-    timestamps: false, // Set to true if you have createdAt/updatedAt columns
+    timestamps: false, // keep false if DB doesn't have createdAt/updatedAt columns
   }
 );
 
